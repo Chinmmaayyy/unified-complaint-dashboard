@@ -470,7 +470,10 @@ function Topbar({ title, user, onLogout, notifications, onNotifClick }) {
   return (
     <div style={styles.topbar}>
       <div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: "#00529B" }}>{title}</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <img src="/logo.png" alt="Logo" style={{ height: 24, width: "auto" }} />
+          <div style={{ fontSize: 18, fontWeight: 700, color: "#00529B" }}>{title}</div>
+        </div>
         <div style={{ fontSize: 10, color: "#64748B", fontWeight: 600 }}>v1.0.3 Build: 2026-03-14_21:35</div>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
