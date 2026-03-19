@@ -1,4 +1,4 @@
-.App {
+/* .App {
   text-align: center;
 }
 
@@ -35,4 +35,35 @@
   to {
     transform: rotate(360deg);
   }
+} */
+
+body {
+  margin: 0;
+  background-color: #F4F7F9; /* Match C.bg */
+  color: #1E293B; /* Match C.textMain */
+  font-family: 'Inter', -apple-system, sans-serif;
+}
+
+/* Fix for Recharts visibility on white backgrounds */
+.recharts-cartesian-grid-horizontal line, 
+.recharts-cartesian-grid-vertical line {
+  stroke: #E2E8F0;
+}
+
+.recharts-text {
+  fill: #64748B !important;
+}
+
+/* Force Recharts SVG pie slices to render */
+.recharts-pie-sector path {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.recharts-surface {
+  overflow: visible !important;
+}
+
+svg.recharts-surface {
+  display: block !important;
 }

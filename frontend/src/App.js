@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,  AreaChart, Area,XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";//
 import { 
   ComposableMap, 
   Geographies, 
@@ -10,25 +10,28 @@ import {
 } from "react-simple-maps";
 
 // ─── COLORS & THEME ───────────────────────────────────────────────────────────
+// ─── UNION BANK OF INDIA THEME ──────────────────────────────────────────────
 const C = {
-  navy: "#0A1628",
-  navyLight: "#0F2040",
-  navyMid: "#142952",
-  blue: "#1A5CFF",
-  blueLight: "#2E6FFF",
-  cyan: "#00D4FF",
-  teal: "#00B8A9",
+  navy: "#00529B",      // Union Blue
+  red: "#D1202F",       // Union Red
+  bg: "#F0F2F5",        // Professional Light Grey
+  surface: "#FFFFFF",   // Card Background
+  border: "#D1D5DB",    // Visible borders
+  // textMain: "#111827",  // High contrast text
+  // textMuted: "#6B7280", // Muted text
+  textMain: "#1F2937",  // Dark Slate Grey (Very visible)
+  textMuted: "#4B5563",
+  white: "#FFFFFF",
   gold: "#F5A623",
-  red: "#FF3B5C",
-  green: "#00C896",
-  purple: "#7B5EA7",
-  gray: "#8B9CBD",
-  grayLight: "#B8C5D6",
-  surface: "#111E35",
-  surfaceLight: "#192845",
-  border: "#1E3050",
-  white: "#E8EFF8",
+  green: "#10B981",
+  cyan: "#00AEEF",
+     
+  gray: "#6B7280",       // muted gray for labels
+  grayLight: "#9CA3AF",  // lighter gray for secondary text
+  navyMid: "#F0F4FA",    // light blue-gray for table headers / bg panels
+  navyLight: "#EFF6FF",  // very light hover background
 };
+
 
 // ─── API CONFIGURATION ──────────────────────────────────────────────────────────
 const api = axios.create({
@@ -48,56 +51,48 @@ api.interceptors.request.use((config) => {
 // ─── DEMO DATA CONSTANTS (Used for Dropdowns & Fallbacks) ─────────────────
 const BRANCHES = ["Mumbai Main", "Delhi CP", "Bangalore MG", "Chennai Anna Nagar", "Kolkata Park Street", "Hyderabad Banjara", "Pune FC Road", "Ahmedabad SG", "Jaipur MI Road", "Lucknow Hazratganj"];
 const CATEGORIES = ["UPI/Digital Payment", "ATM Services", "Internet Banking", "Credit Card", "Loan/EMI", "Account Operations", "Customer Service", "Fraud Alert", "Net Banking", "Mobile App"];
-const PRODUCTS = ["Savings Account", "Current Account", "Credit Card", "Home Loan", "Personal Loan", "Fixed Deposit", "UPI Service", "ATM Card", "Mobile Banking", "Internet Banking"];
 const SOURCES = ["Mobile App", "Internet Banking", "Branch", "Email", "Call Center", "Social Media", "WhatsApp"];
 const STATUSES = ["Open", "In Progress", "Escalated", "Resolved", "Closed"];
 const AGENTS = ["Priya Sharma", "Rahul Verma", "Anita Patel", "Suresh Kumar", "Deepika Nair", "Amit Singh", "Kavya Reddy", "Vikram Joshi"];
 const SEVERITIES = ["Low", "Medium", "High", "Critical"];
 
-const TREND_DATA = [
-  { month: "Aug", complaints: 234, resolved: 210, breaches: 12 },
-  { month: "Sep", complaints: 287, resolved: 261, breaches: 18 },
-  { month: "Oct", complaints: 312, resolved: 298, breaches: 9 },
-  { month: "Nov", complaints: 265, resolved: 243, breaches: 14 },
-  { month: "Dec", complaints: 198, resolved: 185, breaches: 7 },
-  { month: "Jan", complaints: 341, resolved: 310, breaches: 22 },
-  { month: "Feb", complaints: 278, resolved: 256, breaches: 15 },
-  { month: "Mar", complaints: 156, resolved: 132, breaches: 8 },
-];
 
 function randomFrom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
 // ─── STYLES ───────────────────────────────────────────────────────────────────
+
 const styles = {
-  app: { fontFamily: "'DM Sans', 'Segoe UI', sans-serif", background: C.navy, minHeight: "100vh", color: C.white, display: "flex" },
-  sidebar: { width: 240, minHeight: "100vh", background: C.navyLight, borderRight: `1px solid ${C.border}`, display: "flex", flexDirection: "column", flexShrink: 0 },
-  sidebarLogo: { padding: "24px 20px 16px", borderBottom: `1px solid ${C.border}` },
+  app: { fontFamily: "'Inter', sans-serif", background: "#F0F2F5", minHeight: "100vh", color: "#1F2937", display: "flex" },
+  sidebar: { width: 240, minHeight: "100vh", background: "#00529B", display: "flex", flexDirection: "column", flexShrink: 0 },
+  sidebarLogo: { padding: "24px 20px 16px", borderBottom: "1px solid rgba(255,255,255,0.1)" },
   sidebarNav: { flex: 1, padding: "12px 0", overflowY: "auto" },
-  navItem: (active) => ({ display: "flex", alignItems: "center", gap: 12, padding: "10px 20px", cursor: "pointer", borderRadius: "0 24px 24px 0", marginRight: 12, transition: "all 0.2s", background: active ? `linear-gradient(90deg, ${C.blue}22, ${C.blue}11)` : "transparent", borderLeft: active ? `3px solid ${C.blue}` : "3px solid transparent", color: active ? C.white : C.gray, fontWeight: active ? 600 : 400, fontSize: 14 }),
+  navItem: (active) => ({ 
+    display: "flex", alignItems: "center", gap: 12, padding: "12px 20px", cursor: "pointer", 
+    background: active ? "#D1202F" : "transparent", color: "#FFFFFF", fontWeight: active ? 600 : 400, fontSize: 14 
+  }),
   main: { flex: 1, display: "flex", flexDirection: "column", minWidth: 0 },
-  topbar: { height: 64, background: C.navyLight, borderBottom: `1px solid ${C.border}`, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", flexShrink: 0 },
+  topbar: { height: 64, background: "#FFFFFF", borderBottom: "2px solid #00529B", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 24px", flexShrink: 0 },
   content: { flex: 1, padding: 24, overflowY: "auto" },
-  card: { background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, padding: 20 },
-  kpiCard: { background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, padding: 20, display: "flex", flexDirection: "column", gap: 8 },
-  badge: (color) => ({ background: `${color}22`, color, border: `1px solid ${color}44`, padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600, display: "inline-block", whiteSpace: "nowrap" }),
-  btn: (color = C.blue) => ({ background: color, color: "#fff", border: "none", borderRadius: 8, padding: "8px 16px", cursor: "pointer", fontSize: 13, fontWeight: 600, transition: "opacity 0.2s" }),
-  btnOutline: { background: "transparent", color: C.grayLight, border: `1px solid ${C.border}`, borderRadius: 8, padding: "8px 16px", cursor: "pointer", fontSize: 13, fontWeight: 500 },
-  input: { background: C.navyMid, border: `1px solid ${C.border}`, borderRadius: 8, padding: "8px 12px", color: C.white, fontSize: 13, outline: "none", width: "100%" },
-  select: { background: C.navyMid, border: `1px solid ${C.border}`, borderRadius: 8, padding: "8px 12px", color: C.white, fontSize: 13, outline: "none" },
-  label: { fontSize: 11, color: C.gray, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6, display: "block" },
-  sectionTitle: { fontSize: 18, fontWeight: 700, color: C.white, marginBottom: 16 },
-  grid2: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 },
-  grid3: { display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 },
+  card: { background: "#FFFFFF", border: "1px solid #D1D5DB", borderRadius: 8, padding: 20, boxShadow: "0 2px 4px rgba(0,0,0,0.05)" },
+  kpiCard: { background: "#FFFFFF", border: "1px solid #D1D5DB", borderRadius: 8, padding: 20, display: "flex", flexDirection: "column", gap: 8 },
+  badge: (color) => ({ 
+    background: `${color}15`, color: color, border: `1px solid ${color}40`, padding: "2px 10px", borderRadius: 20, fontSize: 11, fontWeight: 700, display: "inline-block" 
+  }),
+  tag: (c) => ({ background: `${c}15`, color: c, border: `1px solid ${c}30`, borderRadius: 6, padding: "2px 8px", fontSize: 10, fontWeight: 700 }),
+  btn: (color = "#00529B") => ({ background: color, color: "#fff", border: "none", borderRadius: 6, padding: "10px 16px", cursor: "pointer", fontSize: 13, fontWeight: 600 }),
+  btnOutline: { background: "white", color: "#4B5563", border: `1px solid #D1D5DB`, borderRadius: 6, padding: "8px 12px", cursor: "pointer", fontSize: 13 },
+  input: { background: "#FFFFFF", border: "1px solid #D1D5DB", borderRadius: 6, padding: "10px", color: "#1F2937", width: "100%", boxSizing: "border-box" },
+  label: { fontSize: 11, color: "#4B5563", fontWeight: 700, textTransform: "uppercase", marginBottom: 6, display: "block" },
   grid4: { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 },
+  grid2: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 },
   flexBetween: { display: "flex", alignItems: "center", justifyContent: "space-between" },
-  tag: (c) => ({ background: `${c}22`, color: c, border: `1px solid ${c}33`, borderRadius: 6, padding: "2px 8px", fontSize: 10, fontWeight: 700 }),
 };
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
-const severityColor = (s) => ({ Critical: C.red, High: C.gold, Medium: C.blue, Low: C.green }[s] || C.gray);
-const statusColor = (s) => ({ Open: C.blue, "In Progress": C.cyan, Escalated: C.red, Resolved: C.green, Closed: C.gray }[s] || C.gray);
-const sentimentColor = (s) => ({ "Very Negative": C.red, Negative: C.gold, Neutral: C.gray, Positive: C.green }[s] || C.gray);
+const severityColor = (s) => ({ Critical: C.red, High: C.gold, Medium: C.navy, Low: C.green }[s] || C.textMuted);
+const statusColor = (s) => ({ Open: C.navy, "In Progress": C.cyan, Escalated: C.red, Resolved: C.green, Closed: C.textMuted }[s] || C.textMuted);
+const sentimentColor = (s) => ({ "Very Negative": C.red, Negative: C.gold, Neutral: C.textMuted, Positive: C.green }[s] || C.textMuted);
 
 function SeverityBadge({ s }) { return <span style={styles.badge(severityColor(s))}>{s}</span>; }
 function StatusBadge({ s }) { return <span style={styles.badge(statusColor(s))}>{s}</span>; }
@@ -136,43 +131,273 @@ function LoginPage({ onLogin }) {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: `linear-gradient(135deg, ${C.navy} 0%, ${C.navyMid} 100%)`, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-      <div style={{ position: "absolute", inset: 0, backgroundImage: `radial-gradient(circle at 20% 50%, ${C.blue}11 0%, transparent 50%), radial-gradient(circle at 80% 20%, ${C.cyan}0A 0%, transparent 50%)`, pointerEvents: "none" }} />
-      <div style={{ width: "100%", maxWidth: 440 }}>
+    // <div style={{ minHeight: "100vh", background: `linear-gradient(135deg, ${C.navy} 0%, ${C.navyMid} 100%)`, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+    //   <div style={{ position: "absolute", inset: 0, backgroundImage: `radial-gradient(circle at 20% 50%, ${C.blue}11 0%, transparent 50%), radial-gradient(circle at 80% 20%, ${C.cyan}0A 0%, transparent 50%)`, pointerEvents: "none" }} />
+    //   <div style={{ width: "100%", maxWidth: 440 }}>
+    //     <div style={{ textAlign: "center", marginBottom: 32 }}>
+    //       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 8 }}>
+    //         <div style={{ width: 44, height: 44, borderRadius: 12, background: `linear-gradient(135deg, ${C.blue}, ${C.cyan})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>🏦</div>
+    //         <div>
+    //           <div style={{ fontSize: 24, fontWeight: 800, color: C.white, letterSpacing: "-0.02em" }}>ComplaintIQ</div>
+    //           <div style={{ fontSize: 11, color: C.cyan, fontWeight: 600, letterSpacing: "0.08em" }}>UNION BANK OF INDIA</div>
+    //         </div>
+    //       </div>
+    //       <p style={{ color: C.gray, fontSize: 14 }}>Intelligent Complaint Resolution Platform</p>
+    //     </div>
+    //     <div style={{ ...styles.card, padding: 32 }}>
+    //       <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6, color: C.navy }}>Sign in to your account</h2>
+    //       <p style={{ color: C.gray, fontSize: 13, marginBottom: 24 }}>Access your complaint management dashboard</p>
+    //       <div style={{ marginBottom: 16 }}>
+    //         <label style={styles.label}>Email Address</label>
+    //         <input style={styles.input} value={email} onChange={e => setEmail(e.target.value)} placeholder="your@unionbank.in" />
+    //       </div>
+    //       <div style={{ marginBottom: 8 }}>
+    //         <label style={styles.label}>Password</label>
+    //         <input style={styles.input} type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••••" />
+    //       </div>
+    //       {error && <div style={{ background: `${C.red}22`, border: `1px solid ${C.red}44`, borderRadius: 8, padding: "10px 14px", color: C.red, fontSize: 13, marginBottom: 16 }}>{error}</div>}
+    //       <button style={{ ...styles.btn(), width: "100%", padding: "12px", fontSize: 15, marginTop: 8, background: `linear-gradient(90deg, ${C.blue}, ${C.blueLight})`, opacity: loading ? 0.7 : 1 }} onClick={handleLogin} disabled={loading}>
+    //         {loading ? "Authenticating..." : "Sign In"}
+    //       </button>
+    //       <div style={{ marginTop: 20, padding: 16, background: C.navyMid, borderRadius: 8, fontSize: 12 }}>
+    //         <div style={{ color: C.grayLight, fontWeight: 600, marginBottom: 8 }}>Demo Credentials:</div>
+    //         {[["Admin", "admin@unionbank.in", "ComplaintIQ@2024"], ["Supervisor", "supervisor@unionbank.in", "Super@2024"], ["Agent", "agent@unionbank.in", "Agent@2024"]].map(([role, em, pw]) => (
+    //           <div key={role} style={{ display: "flex", justifyContent: "space-between", color: C.gray, marginBottom: 4, cursor: "pointer" }} onClick={() => { setEmail(em); setPassword(pw); }}>
+    //             <span style={{ color: C.cyan }}>{role}</span><span>{em}</span>
+    //           </div>
+    //         ))}
+    //       </div>
+    //     </div>
+    //   </div>
+    // </div>
+
+    <div style={{
+      minHeight: "100vh",
+      background: `linear-gradient(145deg, #00529B 0%, #003A72 55%, #1a1a2e 100%)`,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 24,
+      position: "relative",
+      overflow: "hidden",
+      fontFamily: "'Inter', sans-serif",
+    }}>
+
+      {/* CHANGE 2: Decorative background layers for depth */}
+      {/* Top-left radial glow (blue) */}
+      <div style={{
+        position: "absolute", top: -120, left: -120,
+        width: 400, height: 400, borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(0,174,239,0.18) 0%, transparent 70%)",
+        pointerEvents: "none",
+      }} />
+      {/* Bottom-right radial glow (red) */}
+      <div style={{
+        position: "absolute", bottom: -100, right: -80,
+        width: 350, height: 350, borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(209,32,47,0.15) 0%, transparent 70%)",
+        pointerEvents: "none",
+      }} />
+      {/* Subtle diagonal red accent bar at top */}
+      <div style={{
+        position: "absolute", top: 0, left: 0, right: 0,
+        height: 4,
+        background: "linear-gradient(90deg, #D1202F 0%, #FF4D5E 50%, #D1202F 100%)",
+        pointerEvents: "none",
+      }} />
+
+      <div style={{ width: "100%", maxWidth: 440, position: "relative", zIndex: 1 }}>
+
+        {/* CHANGE 3: Header branding — cleaner, bolder Union Bank identity */}
         <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 8 }}>
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: `linear-gradient(135deg, ${C.blue}, ${C.cyan})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>🏦</div>
-            <div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: C.white, letterSpacing: "-0.02em" }}>ComplaintIQ</div>
-              <div style={{ fontSize: 11, color: C.cyan, fontWeight: 600, letterSpacing: "0.08em" }}>UNION BANK OF INDIA</div>
+          <div style={{
+            display: "flex", alignItems: "center",
+            justifyContent: "center", gap: 14, marginBottom: 10,
+          }}>
+            {/* Logo icon — Union Bank blue/red colors */}
+            <div style={{
+              width: 52, height: 52, borderRadius: 14,
+              background: "#FFFFFF",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 26,
+              boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
+              border: "2px solid rgba(209,32,47,0.4)",
+            }}>🏦</div>
+            <div style={{ textAlign: "left" }}>
+              <div style={{
+                fontSize: 26, fontWeight: 800, color: "#FFFFFF",
+                letterSpacing: "-0.02em", lineHeight: 1.1,
+              }}>ComplaintIQ</div>
+              <div style={{
+                fontSize: 10, color: "#00AEEF", fontWeight: 700,
+                letterSpacing: "0.14em", textTransform: "uppercase", marginTop: 2,
+              }}>UNION BANK OF INDIA</div>
             </div>
           </div>
-          <p style={{ color: C.gray, fontSize: 14 }}>Intelligent Complaint Resolution Platform</p>
+          <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 13, margin: 0 }}>
+            Intelligent Complaint Resolution Platform
+          </p>
         </div>
-        <div style={{ ...styles.card, padding: 32 }}>
-          <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 6, color: C.white }}>Sign in to your account</h2>
-          <p style={{ color: C.gray, fontSize: 13, marginBottom: 24 }}>Access your complaint management dashboard</p>
-          <div style={{ marginBottom: 16 }}>
-            <label style={styles.label}>Email Address</label>
-            <input style={styles.input} value={email} onChange={e => setEmail(e.target.value)} placeholder="your@unionbank.in" />
+
+        {/* CHANGE 4: Card — white with stronger shadow, red top border accent */}
+        <div style={{
+          background: "#FFFFFF",
+          borderRadius: 16,
+          padding: 36,
+          boxShadow: "0 20px 60px rgba(0,0,0,0.35), 0 4px 16px rgba(0,0,0,0.2)",
+          border: "1px solid rgba(255,255,255,0.1)",
+          borderTop: "4px solid #D1202F",   // ← Red top accent line
+        }}>
+
+          {/* CHANGE 5: Card heading — navy bold */}
+          <h2 style={{
+            fontSize: 22, fontWeight: 800, marginBottom: 4, marginTop: 0,
+            color: "#00529B",
+          }}>Sign in to your account</h2>
+          <p style={{
+            color: "#6B7280", fontSize: 13,
+            marginBottom: 28, marginTop: 0,
+          }}>Access your complaint management dashboard</p>
+
+          {/* Email field */}
+          <div style={{ marginBottom: 18 }}>
+            <label style={{
+              fontSize: 11, color: "#374151", fontWeight: 700,
+              textTransform: "uppercase", letterSpacing: "0.06em",
+              marginBottom: 6, display: "block",
+            }}>Email Address</label>
+            <input
+              style={{
+                background: "#F9FAFB",
+                border: "1.5px solid #D1D5DB",
+                borderRadius: 8, padding: "11px 14px",
+                color: "#111827", width: "100%",
+                boxSizing: "border-box", fontSize: 14,
+                outline: "none",
+                transition: "border-color 0.2s",
+              }}
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="your@unionbank.in"
+              onFocus={e => e.target.style.borderColor = "#00529B"}
+              onBlur={e => e.target.style.borderColor = "#D1D5DB"}
+            />
           </div>
-          <div style={{ marginBottom: 8 }}>
-            <label style={styles.label}>Password</label>
-            <input style={styles.input} type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••••" />
+
+          {/* Password field */}
+          <div style={{ marginBottom: 10 }}>
+            <label style={{
+              fontSize: 11, color: "#374151", fontWeight: 700,
+              textTransform: "uppercase", letterSpacing: "0.06em",
+              marginBottom: 6, display: "block",
+            }}>Password</label>
+            <input
+              style={{
+                background: "#F9FAFB",
+                border: "1.5px solid #D1D5DB",
+                borderRadius: 8, padding: "11px 14px",
+                color: "#111827", width: "100%",
+                boxSizing: "border-box", fontSize: 14,
+                outline: "none",
+              }}
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="••••••••••"
+              onFocus={e => e.target.style.borderColor = "#00529B"}
+              onBlur={e => e.target.style.borderColor = "#D1D5DB"}
+            />
           </div>
-          {error && <div style={{ background: `${C.red}22`, border: `1px solid ${C.red}44`, borderRadius: 8, padding: "10px 14px", color: C.red, fontSize: 13, marginBottom: 16 }}>{error}</div>}
-          <button style={{ ...styles.btn(), width: "100%", padding: "12px", fontSize: 15, marginTop: 8, background: `linear-gradient(90deg, ${C.blue}, ${C.blueLight})`, opacity: loading ? 0.7 : 1 }} onClick={handleLogin} disabled={loading}>
-            {loading ? "Authenticating..." : "Sign In"}
+
+          {/* CHANGE 6: Error box */}
+          {error && (
+            <div style={{
+              background: "#FEF2F2", border: "1px solid #FECACA",
+              borderRadius: 8, padding: "10px 14px",
+              color: "#D1202F", fontSize: 13, marginBottom: 16,
+              marginTop: 10,
+            }}>{error}</div>
+          )}
+
+          {/* CHANGE 7: Sign In button — solid navy with red hover feel */}
+          <button
+            style={{
+              background: loading
+                ? "#94A3B8"
+                : "linear-gradient(90deg, #00529B 0%, #0066BF 100%)",
+              color: "#fff", border: "none", borderRadius: 10,
+              padding: "13px", fontSize: 15, fontWeight: 700,
+              width: "100%", cursor: loading ? "not-allowed" : "pointer",
+              marginTop: 16,
+              boxShadow: loading ? "none" : "0 4px 14px rgba(0,82,155,0.4)",
+              letterSpacing: "0.02em",
+              transition: "all 0.2s",
+            }}
+            onClick={handleLogin}
+            disabled={loading}
+          >
+            {loading ? "Authenticating..." : "Sign In →"}
           </button>
-          <div style={{ marginTop: 20, padding: 16, background: C.navyMid, borderRadius: 8, fontSize: 12 }}>
-            <div style={{ color: C.grayLight, fontWeight: 600, marginBottom: 8 }}>Demo Credentials:</div>
-            {[["Admin", "admin@unionbank.in", "ComplaintIQ@2024"], ["Supervisor", "supervisor@unionbank.in", "Super@2024"], ["Agent", "agent@unionbank.in", "Agent@2024"]].map(([role, em, pw]) => (
-              <div key={role} style={{ display: "flex", justifyContent: "space-between", color: C.gray, marginBottom: 4, cursor: "pointer" }} onClick={() => { setEmail(em); setPassword(pw); }}>
-                <span style={{ color: C.cyan }}>{role}</span><span>{em}</span>
+
+          {/* CHANGE 8: Demo credentials panel — navy background, styled rows */}
+          <div style={{
+            marginTop: 24, padding: 16,
+            background: "#F0F4FA",
+            borderRadius: 10,
+            border: "1px solid #E2E8F0",
+          }}>
+            <div style={{
+              color: "#374151", fontWeight: 700,
+              fontSize: 11, marginBottom: 10,
+              textTransform: "uppercase", letterSpacing: "0.08em",
+            }}>Demo Credentials</div>
+
+            {[
+              ["Admin",      "admin@unionbank.in",      "ComplaintIQ@2024"],
+              ["Supervisor", "supervisor@unionbank.in", "Super@2024"],
+              ["Agent",      "agent@unionbank.in",      "Agent@2024"],
+            ].map(([role, em, pw]) => (
+              <div
+                key={role}
+                style={{
+                  display: "flex", justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "7px 10px", borderRadius: 7,
+                  marginBottom: 4,
+                  cursor: "pointer",
+                  background: "transparent",
+                  transition: "background 0.15s",
+                }}
+                onClick={() => { setEmail(em); setPassword(pw); }}
+                onMouseEnter={e => e.currentTarget.style.background = "#E0EAF5"}
+                onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+              >
+                {/* Role badge */}
+                <span style={{
+                  background: "#00529B", color: "#fff",
+                  borderRadius: 5, padding: "2px 9px",
+                  fontSize: 11, fontWeight: 700, minWidth: 70,
+                  textAlign: "center",
+                }}>{role}</span>
+                {/* Email */}
+                <span style={{ fontSize: 12, color: "#4B5563", flex: 1, textAlign: "center" }}>{em}</span>
+                {/* Click hint */}
+                <span style={{ fontSize: 10, color: "#9CA3AF" }}>click to fill</span>
               </div>
             ))}
           </div>
+
         </div>
+
+        {/* CHANGE 9: Footer text below card */}
+        <p style={{
+          textAlign: "center", marginTop: 20,
+          fontSize: 11, color: "rgba(255,255,255,0.4)",
+          letterSpacing: "0.04em",
+        }}>
+          © 2026 Union Bank of India · Secure Portal
+        </p>
+
       </div>
     </div>
   );
@@ -194,15 +419,19 @@ function Sidebar({ active, onNav, user }) {
 
   return (
     <div style={styles.sidebar}>
-      <div style={styles.sidebarLogo}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${C.blue}, ${C.cyan})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>🏦</div>
-          <div>
-            <div style={{ fontSize: 16, fontWeight: 800, color: C.white, letterSpacing: "-0.01em" }}>ComplaintIQ</div>
-            <div style={{ fontSize: 9, color: C.cyan, fontWeight: 700, letterSpacing: "0.08em" }}>UNION BANK OF INDIA</div>
-          </div>
+    <div style={styles.sidebarLogo}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ 
+          width: 36, height: 36, borderRadius: 4, background: "#FFFFFF", 
+          display: "flex", alignItems: "center", justifyContent: "center", 
+          fontSize: 18, border: `2px solid #D1202F`, color: "#00529B", fontWeight: "bold" 
+        }}>U</div>
+        <div>
+          <div style={{ fontSize: 16, fontWeight: 800, color: "#FFFFFF" }}>ComplaintIQ</div>
+          <div style={{ fontSize: 9, color: "#00AEEF", fontWeight: 700, letterSpacing: "0.08em" }}>UNION BANK OF INDIA</div>
         </div>
       </div>
+    </div>
       <nav style={styles.sidebarNav}>
         <div style={{ padding: "8px 20px", fontSize: 10, color: C.gray, fontWeight: 700, letterSpacing: "0.1em", marginBottom: 4 }}>MAIN MENU</div>
         {filteredNav.map(item => (
@@ -221,7 +450,7 @@ function Sidebar({ active, onNav, user }) {
       </nav>
       <div style={{ padding: 16, borderTop: `1px solid ${C.border}` }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 34, height: 34, borderRadius: "50%", background: `linear-gradient(135deg, ${C.blue}, ${C.purple})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, flexShrink: 0 }}>
+          <div style={{ width: 34, height: 34, borderRadius: "50%", background: `linear-gradient(135deg, ${C.gold}, ${C.red})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, flexShrink: 0 }}>
             {user.name.split(" ").map(w => w[0]).join("").slice(0, 2)}
           </div>
           <div style={{ minWidth: 0 }}>
@@ -241,8 +470,8 @@ function Topbar({ title, user, onLogout, notifications, onNotifClick }) {
   return (
     <div style={styles.topbar}>
       <div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: C.white }}>{title}</div>
-        <div style={{ fontSize: 10, color: C.cyan, fontWeight: 600 }}>v1.0.3 Build: 2026-03-14_21:35</div>
+        <div style={{ fontSize: 18, fontWeight: 700, color: "#00529B" }}>{title}</div>
+        <div style={{ fontSize: 10, color: "#64748B", fontWeight: 600 }}>v1.0.3 Build: 2026-03-14_21:35</div>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
         <div style={{ position: "relative" }}>
@@ -251,8 +480,8 @@ function Topbar({ title, user, onLogout, notifications, onNotifClick }) {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: C.white }}>{user.name}</div>
-            <div style={{ fontSize: 10, color: C.gray }}>{user.role}</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "#0F172A" }}>{user.name}</div>
+            <div style={{ fontSize: 10, color: "#64748B" }}>{user.role}</div>
           </div>
           <button style={{ ...styles.btnOutline, padding: "6px 10px" }} onClick={onLogout}>↩ Exit</button>
         </div>
@@ -262,16 +491,16 @@ function Topbar({ title, user, onLogout, notifications, onNotifClick }) {
 }
 
 // ─── KPI CARD ─────────────────────────────────────────────────────────────────
-function KpiCard({ icon, label, value, sub, color = C.blue, trend }) {
+function KpiCard({ icon, label, value, sub, color = C.navy, trend }) {
   return (
     <div style={{ ...styles.kpiCard, borderTop: `3px solid ${color}` }}>
       <div style={styles.flexBetween}>
         <span style={{ fontSize: 24 }}>{icon}</span>
-        {trend && <span style={{ fontSize: 11, color: trend > 0 ? C.red : C.green, fontWeight: 600 }}>{trend > 0 ? "▲" : "▼"} {Math.abs(trend)}%</span>}
+        {trend && <span style={{ fontSize: 11, color: C.red > 0 ? C.red : C.green, fontWeight: 600 }}>{trend > 0 ? "▲" : "▼"} {Math.abs(trend)}%</span>}
       </div>
-      <div style={{ fontSize: 32, fontWeight: 800, color: C.white, letterSpacing: "-0.02em" }}>{value}</div>
-      <div style={{ fontSize: 13, fontWeight: 600, color: C.grayLight }}>{label}</div>
-      {sub && <div style={{ fontSize: 11, color: C.gray }}>{sub}</div>}
+      <div style={{ fontSize: 32, fontWeight: 800, color: C.textMain, letterSpacing: "-0.02em" }}>{value}</div>
+      <div style={{ fontSize: 13, fontWeight: 600, color: C.textMuted }}>{label}</div>
+      {sub && <div style={{ fontSize: 11, color: C.textMuted }}>{sub}</div>}
     </div>
   );
 }
@@ -292,7 +521,22 @@ function Dashboard({ user }) {
     async function fetchDashboard() {
       try {
         const res = await api.get('/analytics/dashboard');
-        setData(res.data);
+          console.log('Dashboard API response:', res.data);
+          // Fallback demo data for sentiments if empty
+          const fallbackSentiments = [
+            { name: 'Positive', value: 20, color: '#10B981' },
+            { name: 'Neutral', value: 15, color: '#00529B' },
+            { name: 'Very Negative', value: 14, color: '#D1202F' },
+            { name: 'Negative', value: 7, color: '#F5A623' }
+          ];
+          setData({
+            ...res.data,
+            sentiments: (res.data.sentiments && res.data.sentiments.length > 0)
+              // ? res.data.sentiments
+              ? res.data.sentiments.map(s => ({ ...s, value: Number(s.value) }))
+              : fallbackSentiments
+          });
+          
       } catch (err) {
         console.error('Failed to load dashboard:', err);
       } finally {
@@ -307,25 +551,26 @@ function Dashboard({ user }) {
   const isAdmin = user.role === 'Admin';
   const isSupervisor = user.role === 'Supervisor';
   const isAgent = user.role === 'Agent';
+  console.log("Sentiment Data:", data.sentiments);
+  console.log("Sentiment JSON:", JSON.stringify(data.sentiments));
 
   return (
     <div>
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: C.white }}>
-            {isAdmin ? "Strategic Command Center" : isSupervisor ? "Branch Operations Dashboard" : "Agent Workspace"}
-          </h1>
-          <div style={{ display: "flex", gap: 8 }}>
-            {isAdmin && <button style={styles.btn(C.blueLight)} onClick={() => setShowNewAccount(true)}>👤 + New Account</button>}
-            <span style={{ ...styles.badge(C.green), fontSize: 12 }}>● Live</span>
-            <span style={{ color: C.gray, fontSize: 12 }}>Last updated: just now</span>
-          </div>
-        </div>
-        <p style={{ color: C.gray, fontSize: 13 }}>
-          {isAdmin ? "Enterprise-wide complaint intelligence and system health" : isSupervisor ? `Management overview for your branch performance` : "Personal performance and assigned ticket tracking"}
-        </p>
-      </div>
-
+      
+<div style={{ marginBottom: 24 }}>
+  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+    <h1 style={{ fontSize: 26, fontWeight: 800, color: "#00529B", margin: 0 }}>
+      {isAdmin ? "Strategic Command Center" : "Branch Operations"}
+    </h1>
+    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      {isAdmin && <button style={styles.btn("#00529B")} onClick={() => setShowNewAccount(true)}>👤 + New Account</button>}
+      <span style={{ ...styles.badge("#10B981"), fontSize: 12 }}>● Live</span>
+    </div>
+  </div>
+  <p style={{ color: "#4B5563", fontSize: 15, fontWeight: 500 }}>
+    {isAdmin ? "Enterprise-wide complaint intelligence and system health" : "Management overview"}
+  </p>
+</div>
       {showNewAccount && <NewAccountModal onClose={() => setShowNewAccount(false)} onCreated={() => setShowNewAccount(false)} />}
 
       {/* KPI Grid */}
@@ -335,7 +580,7 @@ function Dashboard({ user }) {
           label={isAgent ? "My Assigned" : "Total Today"} 
           value={isAgent ? data?.kpis?.open : Number(data?.kpis?.open || 0) + Number(data?.kpis?.today || 0)} 
           sub={isAgent ? "Active tickets" : "Across all channels"} 
-          color={C.blue} 
+          color={C.navy} 
           trend={isAdmin ? 12 : null} 
         />
         <KpiCard icon="🔓" label="Open Issues" value={data?.kpis?.open || 0} sub="Awaiting resolution" color={C.gold} />
@@ -345,32 +590,32 @@ function Dashboard({ user }) {
       
       <div style={{ ...styles.grid4, marginTop: 16 }}>
         <KpiCard icon="⚡" label="Critical Severity" value={data?.kpis?.critical || 0} sub="High priority" color={C.red} />
-        {isAdmin && <KpiCard icon="🔍" label="Fraud Alerts" value={data?.kpis?.fraud || 0} sub="Under investigation" color={C.purple} />}
-        {!isAdmin && <KpiCard icon="📅" label="Today's Intake" value={data?.kpis?.today || 0} sub="New tickets" color={C.cyan} />}
-        <KpiCard icon="⏱️" label="Avg. Resolution" value={`${data?.kpis?.avg_res || '0'}h`} sub="System average" color={C.teal} />
+        {isAdmin && <KpiCard icon="🔍" label="Fraud Alerts" value={data?.kpis?.fraud || 0} sub="Under investigation" color={C.cyan} />}
+        {!isAdmin && <KpiCard icon="📅" label="Today's Intake" value={data?.kpis?.today || 0} sub="New tickets" color={C.gold} />}
+        <KpiCard icon="⏱️" label="Avg. Resolution" value={`${data?.kpis?.avg_res || '0'}h`} sub="System average" color={"rgb(255, 230, 0)"} />
         <KpiCard icon="📊" label="SLA Compliance" value={`${data?.kpis?.compliance || '0'}%`} sub="Target: 95%" color={C.cyan} />
       </div>
 
-      {/* Charts Row 1 */}
+      {/* {/* Charts Row 1 */}
       <div style={{ ...styles.grid2, marginTop: 24 }}>
         <div style={styles.card}>
-          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 4 }}>
+          <div style={{ fontSize: 15, fontWeight: 700,color: "#00529B", marginBottom: 4}}>
             {isAgent ? "My Ticket Trend" : "Volume Analytics — 8 Months"}
           </div>
-          <div style={{ fontSize: 12, color: C.gray, marginBottom: 16 }}>Resolved vs SLA Breaches</div>
+          <div style={{ fontSize: 12, color: "#4B5563", marginBottom: 16 }}>Resolved vs SLA Breaches</div>
           <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={data?.trends || []}>
               <defs>
                 <linearGradient id="gblue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={C.blue} stopOpacity={0.3} />
-                  <stop offset="95%" stopColor={C.blue} stopOpacity={0} />
+                  <stop offset="5%" stopColor={C.navy} stopOpacity={0.3} />
+                  <stop offset="95%" stopColor={C.navy} stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke={C.border} />
-              <XAxis dataKey="month" stroke={C.gray} tick={{ fontSize: 11 }} />
-              <YAxis stroke={C.gray} tick={{ fontSize: 11 }} />
+              <XAxis dataKey="month" stroke={"#475569"} tick={{ fontSize: 11 ,fontWeight: 500}} />
+              <YAxis stroke={"#475569"} tick={{ fontSize: 11 ,fontWeight: 500}} />
               <Tooltip contentStyle={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 12 }} />
-              <Area type="monotone" dataKey="complaints" stroke={C.blue} fill="url(#gblue)" strokeWidth={2} name="Total" />
+              <Area type="monotone" dataKey="complaints" stroke={C.navy} fill="url(#gblue)" strokeWidth={2} name="Total" />
               <Area type="monotone" dataKey="resolved" stroke={C.green} fill="transparent" strokeWidth={2} name="Resolved" />
               <Line type="monotone" dataKey="breaches" stroke={C.red} strokeWidth={2} dot={false} name="Breach" />
             </AreaChart>
@@ -383,7 +628,7 @@ function Dashboard({ user }) {
             <ResponsiveContainer width="55%" height={220}>
               <PieChart>
                 <Pie data={data?.sentiments || []} cx="50%" cy="50%" innerRadius={55} outerRadius={85} paddingAngle={3} dataKey="value">
-                  {(data?.sentiments || []).map((e, i) => <Cell key={i} fill={e.color || C.blue} />)}
+                  {(data?.sentiments || []).map((e, i) => <Cell key={i} fill={e.color || C.navy} />)}
                 </Pie>
                 <Tooltip contentStyle={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 12 }} />
               </PieChart>
@@ -393,7 +638,7 @@ function Dashboard({ user }) {
                 <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                     <div style={{ width: 8, height: 8, borderRadius: 2, background: d.color || C.blue, flexShrink: 0 }} />
-                    <span style={{ fontSize: 11, color: C.grayLight }}>{d.name.split(" ")[0]}</span>
+                    <span style={{ fontSize: 11, color: C.textMuted }}>{d.name.split(" ")[0]}</span>
                   </div>
                   <span style={{ fontSize: 11, fontWeight: 700, color: C.white }}>{d.value}%</span>
                 </div>
@@ -401,8 +646,8 @@ function Dashboard({ user }) {
             </div>
           </div>
         </div>
-      </div>
-
+      </div> 
+      
       {/* Row 2: Only show for Admin/Supervisor */}
       {(isAdmin || isSupervisor) && (
         <div style={{ marginTop: 16 }}>
@@ -414,10 +659,10 @@ function Dashboard({ user }) {
             <ResponsiveContainer width="100%" height={200}>
               {isAdmin ? (
                 <BarChart data={data?.branches || []} barSize={16}>
-                  <XAxis dataKey="branch" stroke={C.gray} tick={{ fontSize: 10 }} />
-                  <Tooltip contentStyle={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 12 }} />
-                  <Bar dataKey="complaints" fill={C.blue} radius={[4, 4, 0, 0]} name="Total" />
-                  <Bar dataKey="resolved" fill={C.green} radius={[4, 4, 0, 0]} name="Resolved" />
+                  <XAxis dataKey="branch" stroke={"#4B5563"} tick={{ fontSize: 10, fontWeight: 600 }} />
+                  <Tooltip contentStyle={{ background: "#FFFFFF", border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 12, color: "#1F2937" }} />
+                  <Bar dataKey="complaints" fill="#00529B" radius={[4, 4, 0, 0]} name="Total" />
+                  <Bar dataKey="resolved" fill="#10B981" radius={[4, 4, 0, 0]} name="Resolved" />
                 </BarChart>
               ) : (
                 <BarChart data={data?.categories || []} barSize={16}>
@@ -432,9 +677,9 @@ function Dashboard({ user }) {
       )}
 
       {/* AI Insights Banner (All roles) */}
-      <div style={{ marginTop: 16, background: `linear-gradient(90deg, ${C.navy}, ${C.navyMid})`, border: `1px solid ${C.blue}44`, borderRadius: 12, padding: 20 }}>
+      <div style={{ marginTop: 16, background: `linear-gradient(90deg, ${C.bg}, ${C.navyMid})`, border: `1px solid ${C.navy}44`, borderRadius: 12, padding: 20 }}>
         <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
-          <div style={{ width: 44, height: 44, borderRadius: 12, background: `linear-gradient(135deg, ${C.blue}44, ${C.cyan}22)`, border: `1px solid ${C.blue}44`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>🤖</div>
+          <div style={{ width: 44, height: 44, borderRadius: 12, background: `linear-gradient(135deg, ${C.navy}44, ${C.cyan}22)`, border: `1px solid ${C.navy}44`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>🤖</div>
           <div>
             <div style={{ fontSize: 13, fontWeight: 700, color: C.cyan, marginBottom: 6 }}>ComplaintIQ AI — {isAgent ? "Personal Workflow Optimization" : "Trend Intelligence Report"}</div>
             <div style={{ fontSize: 13, color: C.grayLight, lineHeight: 1.6 }}>
@@ -549,7 +794,7 @@ function ComplaintsList({ onView }) {
                     <div style={{ fontSize: 10, color: C.gray }}>{c.source}</div>
                   </td>
                   <td style={{ padding: "12px 16px" }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: C.white }}>{c.customer_name || 'N/A'}</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>{c.customer_name || 'N/A'}</div>
                     <div style={{ fontSize: 10, color: C.gray }}>{c.account_number}</div>
                   </td>
                   <td style={{ padding: "12px 16px" }}>
@@ -563,7 +808,7 @@ function ComplaintsList({ onView }) {
                   <td style={{ padding: "12px 16px" }}><SLATimer hours={c.hours_remaining} /></td>
                   <td style={{ padding: "12px 16px" }}><StatusBadge s={c.status} /></td>
                   <td style={{ padding: "12px 16px" }}>
-                    <button style={{ ...styles.btn(C.navyMid), padding: "4px 10px", border: `1px solid ${C.border}`, fontSize: 12 }} onClick={e => { e.stopPropagation(); onView(c); }}>View →</button>
+                    <button style={{ ...styles.btnOutline, color: C.navy, borderColor: C.navy, padding: "4px 10px", fontSize: 12, fontWeight: 600 }} onClick={e => { e.stopPropagation(); onView(c); }}>View →</button>
                   </td>
                 </tr>
               ))}
@@ -633,7 +878,7 @@ function ComplaintDetail({ complaint: c, onBack, user }) {
   async function handleReassign() {
     if (!selectedAgentId) return alert("Please select an agent");
     try {
-      const res = await api.patch(`/complaints/${c.complaint_id || c.id}/assign`, { agentId: selectedAgentId });
+      await api.patch(`/complaints/${c.complaint_id || c.id}/assign`, { agentId: selectedAgentId });
       alert("Complaint reassigned successfully");
       window.location.reload();
     } catch (err) {
@@ -643,7 +888,7 @@ function ComplaintDetail({ complaint: c, onBack, user }) {
 
   async function handleStatusUpdate(newStatus) {
     try {
-      const res = await api.patch(`/complaints/${c.complaint_id || c.id}/status`, { status: newStatus });
+      await api.patch(`/complaints/${c.complaint_id || c.id}/status`, { status: newStatus });
       alert(`Complaint status updated to ${newStatus}`);
       window.location.reload(); // Refresh to see changes
     } catch (err) {
@@ -674,8 +919,8 @@ function ComplaintDetail({ complaint: c, onBack, user }) {
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
         <button style={styles.btnOutline} onClick={onBack}>← Back</button>
         <div>
-          <h1 style={{ fontSize: 20, fontWeight: 800 }}>{c.complaint_id || c.id}</h1>
-          <div style={{ fontSize: 12, color: C.gray }}>{c.customer_name || 'N/A'} · {c.branch} · {c.source}</div>
+          <h1 style={{ fontSize: 20, fontWeight: 800, color: "#00529B" }}>{c.complaint_id || c.id}</h1>
+          <div style={{ fontSize: 12, color: "#64748B" }}>{c.customer_name || 'N/A'} · {c.branch} · {c.source}</div>
         </div>
         <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
           <SeverityBadge s={c.severity} />
@@ -687,7 +932,7 @@ function ComplaintDetail({ complaint: c, onBack, user }) {
       {/* Tabs */}
       <div style={{ display: "flex", gap: 4, marginBottom: 20, background: C.surface, padding: 4, borderRadius: 10, border: `1px solid ${C.border}`, width: "fit-content" }}>
         {TABS.map(t => (
-          <button key={t} onClick={() => setTab(t)} style={{ ...styles.btn(tab === t ? C.blue : "transparent"), color: tab === t ? "#fff" : C.gray, padding: "6px 16px", fontSize: 13, border: "none" }}>
+          <button key={t} onClick={() => setTab(t)} style={{ ...styles.btn(tab === t ? C.navy : "transparent"), color: tab === t ? "#fff" : C.gray, padding: "6px 16px", fontSize: 13, border: "none" }}>
             {t === "overview" ? "📋 Overview" : t === "ai-insights" ? "🤖 AI Insights" : t === "response" ? "✉️ AI Response" : "🕐 Timeline"}
           </button>
         ))}
@@ -698,16 +943,16 @@ function ComplaintDetail({ complaint: c, onBack, user }) {
           {/* Left column */}
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <div style={styles.card}>
-              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: C.cyan }}>👤 Customer Profile</div>
+              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: "#00529B", borderBottom: "1px solid #E2E8F0", paddingBottom: 8 }}>👤 Customer Profile</div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 {[["Customer", c.customer_name], ["Account No.", c.account_number], ["Account Type", c.account_type || 'Savings'], ["Branch", c.branch]].map(([k, v]) => (
-                  <div key={k}><div style={styles.label}>{k}</div><div style={{ fontSize: 13, fontWeight: 600, color: C.white }}>{v || 'N/A'}</div></div>
+                  <div key={k}><div style={styles.label}>{k}</div><div style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>{v || 'N/A'}</div></div>
                 ))}
               </div>
             </div>
             <div style={styles.card}>
-              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12, color: C.cyan }}>📝 Complaint Description</div>
-              <div style={{ fontSize: 13, color: C.grayLight, lineHeight: 1.7, background: C.navyMid, padding: 14, borderRadius: 8, border: `1px solid ${C.border}` }}>{c.description}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12, color: "#00529B" }}>📝 Complaint Description</div>
+              <div style={{ fontSize: 13, color: C.textMuted, lineHeight: 1.7, background: C.navyMid, padding: 14, borderRadius: 8, border: `1px solid ${C.border}` }}>{c.description}</div>
               <div style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap" }}>
                 <span style={styles.tag(C.cyan)}>{c.category}</span>
                 <span style={styles.tag(C.gold)}>{c.product}</span>
@@ -718,7 +963,7 @@ function ComplaintDetail({ complaint: c, onBack, user }) {
             <div style={styles.card}>
               <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12, color: C.cyan }}>📌 Internal Notes</div>
               {notes.map((n, i) => (
-                <div key={i} style={{ background: C.navyMid, padding: 10, borderRadius: 8, marginBottom: 8, fontSize: 13, color: C.grayLight, borderLeft: `3px solid ${C.blue}` }}>{n}</div>
+                <div key={i} style={{ background: C.navyMid, padding: 10, borderRadius: 8, marginBottom: 8, fontSize: 13, color: C.grayLight, borderLeft: `3px solid ${C.navy}` }}>{n}</div>
               ))}
               <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
                 <input style={{ ...styles.input, flex: 1 }} value={noteText} onChange={e => setNoteText(e.target.value)} placeholder="Add internal note..." />
@@ -734,7 +979,7 @@ function ComplaintDetail({ complaint: c, onBack, user }) {
                 {[["Category", c.category], ["Product", c.product], ["Source", c.source], ["Assigned Agent", c.agent], ["Created", new Date(c.createdAt).toLocaleDateString()], ["Fraud Risk", c.fraudRisk]].map(([k, v]) => (
                   <div key={k} style={{ ...styles.flexBetween, borderBottom: `1px solid ${C.border}`, paddingBottom: 8 }}>
                     <span style={{ fontSize: 12, color: C.gray }}>{k}</span>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: C.white }}>{v}</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: C.textMuted }}>{v}</span>
                   </div>
                 ))}
               </div>
@@ -762,7 +1007,7 @@ function ComplaintDetail({ complaint: c, onBack, user }) {
                 <button style={{ ...styles.btn(C.green), textAlign: "left" }} onClick={() => handleStatusUpdate('Resolved')}>✅ Mark Resolved</button>
                 <button style={{ ...styles.btn(C.red), textAlign: "left" }} onClick={() => handleStatusUpdate('Closed')}>🔒 Close Complaint</button>
                 <button style={{ ...styles.btn(C.gold), textAlign: "left" }} onClick={() => handleStatusUpdate('Escalated')}>📤 Escalate to Supervisor</button>
-                <button style={{ ...styles.btn(C.blue), textAlign: "left" }} onClick={() => handleStatusUpdate('In Progress')}>⏳ Mark In Progress</button>
+                <button style={{ ...styles.btn(C.navy), textAlign: "left" }} onClick={() => handleStatusUpdate('In Progress')}>⏳ Mark In Progress</button>
                 
                 {/* Reassign Section */}
                 {(user.role === 'Admin' || user.role === 'Supervisor') && (
@@ -788,7 +1033,7 @@ function ComplaintDetail({ complaint: c, onBack, user }) {
       {tab === "ai-insights" && (
         <div style={styles.grid2}>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div style={{ ...styles.card, border: `1px solid ${C.blue}44`, background: `linear-gradient(135deg, ${C.navy}, ${C.navyMid})` }}>
+            <div style={{ ...styles.card, border: `1px solid ${C.navy}44`, background: `linear-gradient(135deg, ${C.white}, ${C.bg})` }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
                 <span style={{ fontSize: 24 }}>🤖</span>
                 <div>
@@ -821,7 +1066,7 @@ function ComplaintDetail({ complaint: c, onBack, user }) {
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {[
-              { icon: "🏷️", label: "AI Detected Category", value: c.aiCategory, color: C.blue },
+              { icon: "🏷️", label: "AI Detected Category", value: c.aiCategory, color: C.navy },
               { icon: "😔", label: "Customer Sentiment", value: c.sentiment, color: sentimentColor(c.sentiment) },
               { icon: "⚡", label: "Severity Level", value: c.severity, color: severityColor(c.severity) },
               { icon: "🔍", label: "Root Cause", value: c.rootCause, color: C.gold },
@@ -836,9 +1081,9 @@ function ComplaintDetail({ complaint: c, onBack, user }) {
                 </div>
               </div>
             ))}
-            <div style={{ ...styles.card, background: `${C.teal}11`, border: `1px solid ${C.teal}44` }}>
+            <div style={{ ...styles.card, background: `${C.white}11`, border: `1px solid ${C.white}44` }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: C.teal, marginBottom: 8 }}>💡 AI Resolution Suggestion</div>
-              <div style={{ fontSize: 13, color: C.grayLight, lineHeight: 1.6 }}>{c.resolutionSuggestion}</div>
+              <div style={{ fontSize: 13, color: C.white, lineHeight: 1.6 }}>{c.resolutionSuggestion}</div>
             </div>
           </div>
         </div>
@@ -852,7 +1097,7 @@ function ComplaintDetail({ complaint: c, onBack, user }) {
                 <div style={{ fontSize: 15, fontWeight: 700 }}>✉️ AI-Generated Customer Response</div>
                 <div style={{ fontSize: 12, color: C.gray, marginTop: 2 }}>Powered by Claude AI · Review before sending</div>
               </div>
-              <button style={{ ...styles.btn(`linear-gradient(90deg, ${C.blue}, ${C.cyan})`), display: "flex", alignItems: "center", gap: 8 }} onClick={generateAiResponse} disabled={aiLoading}>
+              <button style={{ ...styles.btn(`linear-gradient(90deg, ${C.navy}, ${C.cyan})`), display: "flex", alignItems: "center", gap: 8 }} onClick={generateAiResponse} disabled={aiLoading}>
                 {aiLoading ? "⟳ Generating..." : "🤖 Generate AI Response"}
               </button>
             </div>
@@ -862,7 +1107,7 @@ function ComplaintDetail({ complaint: c, onBack, user }) {
                 <div style={{ display: "flex", gap: 8 }}>
                   <button style={styles.btn(C.green)} onClick={handleSendEmail}>📤 Send via Email</button>
                   <button style={styles.btnOutline}>✏️ Edit Response</button>
-                  <button style={{ ...styles.btn(C.blue) }} onClick={generateAiResponse}>🔄 Regenerate</button>
+                  <button style={{ ...styles.btn(C.navy) }} onClick={generateAiResponse}>🔄 Regenerate</button>
                 </div>
               </div>
             ) : (
@@ -894,14 +1139,14 @@ function ComplaintDetail({ complaint: c, onBack, user }) {
           <div style={styles.card}>
             <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 20 }}>🕐 Complaint Timeline</div>
             {[
-              { time: "2 days ago", icon: "📨", text: `Complaint received via ${c.source}`, color: C.blue },
+              { time: "2 days ago", icon: "📨", text: `Complaint received via ${c.source}`, color: C.navy },
               { time: "2 days ago", icon: "🤖", text: "AI analysis completed — Category, severity, sentiment detected", color: C.cyan },
-              { time: "2 days ago", icon: "👤", text: `Assigned to ${c.agent}`, color: C.teal },
+              { time: "2 days ago", icon: "👤", text: `Assigned to ${c.agent}`, color: C.green },
               { time: "1 day ago", icon: "📝", text: "Agent reviewed complaint and added internal note", color: C.gold },
               { time: "1 day ago", icon: "📤", text: "Initial response sent to customer via email", color: C.green },
               { time: "8 hours ago", icon: "📞", text: "Customer called back — issue still unresolved", color: C.red },
               { time: "6 hours ago", icon: "⚡", text: "Escalated to supervisor due to SLA approaching", color: C.gold },
-              { time: "Now", icon: "⏳", text: "Resolution in progress", color: C.gray },
+              { time: "Now", icon: "⏳", text: "Resolution in progress", color: C.green },
             ].map((ev, i) => (
               <div key={i} style={{ display: "flex", gap: 16, marginBottom: 20, position: "relative" }}>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -909,7 +1154,7 @@ function ComplaintDetail({ complaint: c, onBack, user }) {
                   {i < 7 && <div style={{ width: 2, flex: 1, background: `${C.border}`, marginTop: 4, minHeight: 24 }} />}
                 </div>
                 <div style={{ paddingTop: 6 }}>
-                  <div style={{ fontSize: 13, color: C.white, fontWeight: 500 }}>{ev.text}</div>
+                  <div style={{ fontSize: 13, color: C.textMain, fontWeight: 500 }}>{ev.text}</div>
                   <div style={{ fontSize: 11, color: C.gray, marginTop: 2 }}>{ev.time}</div>
                 </div>
               </div>
@@ -982,7 +1227,7 @@ function Analytics() {
       </div>
 
       {aiReport && (
-        <div style={{ ...styles.card, marginBottom: 20, border: `1px solid ${C.cyan}44`, background: `${C.blue}08` }}>
+        <div style={{ ...styles.card, marginBottom: 20, border: `1px solid ${C.cyan}44`, background: `${C.navy}08` }}>
           <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
             <span style={{ fontSize: 20 }}>🤖</span>
             <div>
@@ -1007,7 +1252,7 @@ function Analytics() {
                 <XAxis dataKey="hour" stroke={C.gray} fontSize={10} axisLine={false} tickLine={false} />
                 <YAxis stroke={C.gray} fontSize={10} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={{ background: C.surface, border: `1px solid ${C.border}`, color: C.white }} />
-                <Bar dataKey="count" fill={C.blue} radius={[4, 4, 0, 0]} barSize={20} />
+                <Bar dataKey="count" fill={C.navy} radius={[4, 4, 0, 0]} barSize={20} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -1078,7 +1323,7 @@ function Analytics() {
             <tbody>
               {AGENTS.map((agent, i) => (
                 <tr key={agent} style={{ borderBottom: `1px solid ${C.border}22` }}>
-                  <td style={{ padding: "12px 16px", fontSize: 13, fontWeight: 600 }}>{agent}</td>
+                  <td style={{ padding: "12px 16px", fontSize: 13, fontWeight: 600 , color: C.cyan}}>{agent}</td>
                   <td style={{ padding: "12px 16px", fontSize: 13, color: C.green }}>{25 + i * 2}</td>
                   <td style={{ padding: "12px 16px", fontSize: 13, color: C.gold }}>{4 + i}</td>
                   <td style={{ padding: "12px 16px", fontSize: 13 }}>{92 - i}%</td>
@@ -1142,11 +1387,27 @@ function GeoMap() {
                     <Geography
                       key={geo.rsmKey}
                       geography={geo}
+                      // style={{
+                      //   default: { fill: "#F8FAFC", stroke: C.border, strokeWidth: 2, outline: "none" },
+                      //   hover: { fill: `${"#CBD5E1"}`, stroke: C.white, strokeWidth: 1, outline: "none" },
+                      //   pressed: { fill: C.blue, outline: "none" },
+                      // }}
                       style={{
-                        default: { fill: C.navy, stroke: C.border, strokeWidth: 0.5, outline: "none" },
-                        hover: { fill: `${C.blue}44`, stroke: C.blue, strokeWidth: 1, outline: "none" },
-                        pressed: { fill: C.blue, outline: "none" },
-                      }}
+          default: { 
+            fill: "#F1F5F9",          // Light professional grey
+            stroke: "#CBD5E1",       // Subtle border
+            strokeWidth: 0.5, 
+            outline: "none" 
+          },
+          hover: { 
+            fill: "#00529B",         // Union Blue on hover
+            fillOpacity: 0.1,        // Very faint blue tint
+            stroke: "#00529B", 
+            strokeWidth: 1, 
+            outline: "none" 
+          },
+          pressed: { fill: "#E2E8F0", outline: "none" },
+        }}
                     />
                   ))
                 }
@@ -1179,7 +1440,7 @@ function GeoMap() {
               <div style={styles.grid2}>
                 <div>
                   <div style={{ fontSize: 10, color: C.gray, fontWeight: 700 }}>TOTAL COMPLAINTS</div>
-                  <div style={{ fontSize: 20, fontWeight: 800, color: C.white }}>{selected.count}</div>
+                  <div style={{ fontSize: 20, fontWeight: 800, color: C.textMuted }}>{selected.count}</div>
                 </div>
                 <div>
                   <div style={{ fontSize: 10, color: C.gray, fontWeight: 700 }}>SEVERITY LEVEL</div>
@@ -1199,7 +1460,7 @@ function GeoMap() {
                 {branches.slice(0, 10).map(b => (
                   <div key={b.name} style={{ ...styles.flexBetween, padding: "8px 12px", background: b.name === hovered ? C.navyMid : "transparent", borderRadius: 8, cursor: "pointer" }} onMouseEnter={() => setHovered(b.name)} onMouseLeave={() => setHovered(null)} onClick={() => setSelected(b)}>
                     <div>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: C.white }}>{b.name}</div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: C.cyan }}>{b.name}</div>
                       <div style={{ fontSize: 10, color: C.gray }}>{b.count} complaints</div>
                     </div>
                     <div style={{ width: 6, height: 6, borderRadius: "50%", background: b.severity === "high" ? C.red : b.severity === "medium" ? C.gold : C.cyan }} />
@@ -1234,7 +1495,7 @@ function Reports() {
   }
 
   const REPORT_TYPES = [
-    { id: "Monthly Compliance Report", icon: "📋", desc: "SLA compliance, resolution rates, regulatory metrics", color: C.blue },
+    { id: "Monthly Compliance Report", icon: "📋", desc: "SLA compliance, resolution rates, regulatory metrics", color: C.navy },
     { id: "Branch Performance Report", icon: "🏦", desc: "Complaint volume, resolution time by branch", color: C.teal },
     { id: "Fraud Risk Report", icon: "🚨", desc: "Fraud patterns, suspicious activity, risk indicators", color: C.red },
     { id: "Agent Performance Report", icon: "👥", desc: "Agent stats, CSAT scores, resolution efficiency", color: C.purple },
@@ -1253,7 +1514,7 @@ function Reports() {
         {REPORT_TYPES.map(r => (
           <div key={r.id} style={{ ...styles.card, borderTop: `3px solid ${r.color}` }}>
             <div style={{ fontSize: 28, marginBottom: 10 }}>{r.icon}</div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: C.white, marginBottom: 6 }}>{r.id}</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: C.cyan, marginBottom: 6 }}>{r.id}</div>
             <div style={{ fontSize: 12, color: C.gray, marginBottom: 16, lineHeight: 1.5 }}>{r.desc}</div>
             <button style={{ ...styles.btn(r.color), fontSize: 12, width: "100%" }} onClick={() => generateReport(r.id)} disabled={generating === r.id}>
               {generating === r.id ? "⟳ Generating..." : "🤖 AI Generate"}
@@ -1268,7 +1529,7 @@ function Reports() {
       </div>
 
       {aiReport && (
-        <div style={{ ...styles.card, border: `1px solid ${C.blue}44` }}>
+        <div style={{ ...styles.card, border: `1px solid ${C.navy}44` }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
             <div style={{ fontSize: 15, fontWeight: 700, color: C.cyan }}>🤖 AI Generated Report</div>
             <div style={{ display: "flex", gap: 8 }}>
@@ -1286,7 +1547,7 @@ function Reports() {
           {[["All Complaints", "csv"], ["SLA Breaches", "excel"], ["Fraud Cases", "pdf"], ["Open Complaints", "csv"]].map(([label, fmt]) => (
             <button key={label} style={{ ...styles.btnOutline, padding: "12px", textAlign: "center" }}>
               <div style={{ fontSize: 20, marginBottom: 6 }}>⬇</div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: C.white }}>{label}</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: C.textMuted }}>{label}</div>
               <div style={{ fontSize: 10, color: C.gray, marginTop: 2 }}>.{fmt}</div>
             </button>
           ))}
@@ -1317,7 +1578,7 @@ function Admin({ user }) {
       </div>
       <div style={{ display: "flex", gap: 4, marginBottom: 20, background: C.surface, padding: 4, borderRadius: 10, border: `1px solid ${C.border}`, width: "fit-content", flexWrap: "wrap" }}>
         {ADMIN_TABS.map(([id, label]) => (
-          <button key={id} onClick={() => setActiveTab(id)} style={{ ...styles.btn(activeTab === id ? C.blue : "transparent"), color: activeTab === id ? "#fff" : C.gray, padding: "6px 14px", fontSize: 13, border: "none" }}>{label}</button>
+          <button key={id} onClick={() => setActiveTab(id)} style={{ ...styles.btn(activeTab === id ? C.navy : "transparent"), color: activeTab === id ? "#fff" : C.gray, padding: "6px 14px", fontSize: 13, border: "none" }}>{label}</button>
         ))}
       </div>
 
@@ -1341,7 +1602,7 @@ function Admin({ user }) {
                 ["Sanjay Iyer", "compliance@unionbank.in", "Compliance Officer", "Mumbai Main", C.purple],
               ].map(([name, email, role, branch, color], i) => (
                 <tr key={i} style={{ borderBottom: `1px solid ${C.border}22` }}>
-                  <td style={{ padding: "10px 16px", fontWeight: 600, color: C.white, fontSize: 13 }}>{name}</td>
+                  <td style={{ padding: "10px 16px", fontWeight: 600, color: C.navy, fontSize: 13 }}>{name}</td>
                   <td style={{ padding: "10px 16px", fontSize: 12, color: C.gray }}>{email}</td>
                   <td style={{ padding: "10px 16px" }}><span style={styles.badge(color)}>{role}</span></td>
                   <td style={{ padding: "10px 16px", fontSize: 12, color: C.gray }}>{branch}</td>
@@ -1365,7 +1626,7 @@ function Admin({ user }) {
             {CATEGORIES.map((cat, i) => (
               <div key={cat} style={{ ...styles.flexBetween, background: C.navyMid, padding: "12px 16px", borderRadius: 8 }}>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: C.white }}>{cat}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: C.textMuted }}>{cat}</div>
                   <div style={{ fontSize: 11, color: C.gray }}>SLA: {[4, 8, 12, 24, 48, 4, 24, 2, 12, 8][i]}h · Priority: {["Critical", "High", "Medium", "High", "Medium", "Critical", "Medium", "Critical", "High", "Medium"][i]}</div>
                 </div>
                 <button style={{ ...styles.btnOutline, fontSize: 11, padding: "4px 8px" }}>Edit</button>
@@ -1382,7 +1643,7 @@ function Admin({ user }) {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
               <div style={{ background: C.navyMid, padding: 16, borderRadius: 10, border: `2px solid ${C.green}44` }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
-                  <div style={{ fontWeight: 700, color: C.white }}>Primary: Groq API</div>
+                  <div style={{ fontWeight: 700, color: C.navy }}>Primary: Groq API</div>
                   <span style={styles.badge(C.green)}>Active</span>
                 </div>
                 <div style={styles.label}>Model</div>
@@ -1392,7 +1653,7 @@ function Admin({ user }) {
               </div>
               <div style={{ background: C.navyMid, padding: 16, borderRadius: 10, border: `1px solid ${C.border}` }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
-                  <div style={{ fontWeight: 700, color: C.white }}>Fallback: Gemini API</div>
+                  <div style={{ fontWeight: 700, color: C.navy }}>Fallback: Gemini API</div>
                   <span style={styles.badge(C.gold)}>Standby</span>
                 </div>
                 <div style={styles.label}>Model</div>
@@ -1426,17 +1687,17 @@ function Admin({ user }) {
               { trigger: "SLA Breach > 2 hours", action: "Escalate to Supervisor", via: "Email + SMS", color: C.gold },
               { trigger: "SLA Breach > 6 hours", action: "Escalate to Compliance Officer", via: "Email", color: C.red },
               { trigger: "Fraud Risk = High", action: "Immediate Compliance Alert", via: "Email + Phone", color: C.red },
-              { trigger: "Critical Severity", action: "Notify Branch Manager", via: "Email", color: C.purple },
+              { trigger: "Critical Severity", action: "Notify Branch Manager", via: "Email", color: C.gold },
               { trigger: "Duplicate > 3 similar", action: "Flag for Investigation", via: "Dashboard Alert", color: C.cyan },
             ].map((r, i) => (
               <div key={i} style={{ background: C.navyMid, padding: 16, borderRadius: 8, border: `1px solid ${r.color}33`, display: "flex", gap: 16, alignItems: "center" }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 12, color: C.gray, marginBottom: 4 }}>TRIGGER</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: C.white }}>{r.trigger}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>{r.trigger}</div>
                 </div>
                 <div style={{ color: C.gray, fontSize: 20 }}>→</div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 12, color: C.gray, marginBottom: 4 }}>ACTION</div>
+                  <div style={{ fontSize: 12, color: C.textMain, marginBottom: 4 }}>ACTION</div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: r.color }}>{r.action}</div>
                 </div>
                 <div>
@@ -1457,11 +1718,11 @@ function Admin({ user }) {
             <button style={styles.btn()}>+ Add Template</button>
           </div>
           {["UPI Transaction Failure", "ATM Cash Dispense Issue", "Account Access Problem", "Credit Card Dispute"].map((t, i) => (
-            <div key={t} style={{ background: C.navyMid, padding: 14, borderRadius: 8, marginBottom: 10 }}>
+            <div key={t} style={{ background: C.bg, padding: 14, borderRadius: 8, marginBottom: 10 }}>
               <div style={{ ...styles.flexBetween, marginBottom: 8 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: C.white }}>{t}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: C.textMuted }}>{t}</div>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <button style={{ ...styles.btn(C.blue), fontSize: 11, padding: "4px 10px" }}>Edit</button>
+                  <button style={{ ...styles.btn(C.navy), fontSize: 11, padding: "4px 10px" }}>Edit</button>
                   <button style={{ ...styles.btnOutline, fontSize: 11, padding: "4px 10px" }}>Preview</button>
                 </div>
               </div>
@@ -1542,7 +1803,7 @@ function NewComplaintModal({ onClose, onCreated }) {
 
         <div style={{ display: "flex", gap: 12 }}>
           <button style={{ ...styles.btnOutline, flex: 1 }} onClick={onClose} disabled={loading}>Cancel</button>
-          <button style={{ ...styles.btn(), flex: 1, background: `linear-gradient(90deg, ${C.blue}, ${C.blueLight})` }} onClick={handleSubmit} disabled={loading}>
+          <button style={{ ...styles.btn(), flex: 1, background: `linear-gradient(90deg, ${C.navy}, ${"rgb(169, 208, 255)"})` }} onClick={handleSubmit} disabled={loading}>
             {loading ? "Registering..." : "Submit Complaint"}
           </button>
         </div>
@@ -1635,7 +1896,7 @@ function NewAccountModal({ onClose, onCreated }) {
 
         <div style={{ display: "flex", gap: 12 }}>
           <button style={{ ...styles.btnOutline, flex: 1 }} onClick={onClose} disabled={loading}>Cancel</button>
-          <button style={{ ...styles.btn(C.blue), flex: 1 }} onClick={handleSubmit} disabled={loading}>
+          <button style={{ ...styles.btn(C.navy), flex: 1 }} onClick={handleSubmit} disabled={loading}>
             {loading ? "Creating..." : "Create Account"}
           </button>
         </div>
@@ -1678,40 +1939,99 @@ function Chatbot() {
 
   return (
     <>
-      {/* Floating button */}
-      <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 1000 }}>
+      {/* Floating button and Chat Window Container */}
+      <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
         {open && (
-          <div style={{ position: "absolute", bottom: 64, right: 0, width: 360, height: 480, background: C.surface, border: `1px solid ${C.border}`, borderRadius: 16, display: "flex", flexDirection: "column", boxShadow: `0 20px 60px #00000066`, overflow: "hidden" }}>
-            <div style={{ padding: "14px 16px", background: `linear-gradient(90deg, ${C.blue}, ${C.blueLight})`, display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#ffffff33", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🤖</div>
+          <div style={{ 
+            marginBottom: 16, // Space between window and button
+            width: 360, 
+            height: 500, 
+            background: "#FFFFFF", 
+            border: `1px solid ${C.border}`, 
+            borderRadius: 16, 
+            display: "flex", 
+            flexDirection: "column", 
+            boxShadow: `0 10px 40px rgba(0,0,0,0.15)`, 
+            overflow: "hidden" 
+          }}>
+            {/* Header: Union Blue Background */}
+            <div style={{ padding: "16px", background: C.navy, display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🤖</div>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>ComplaintIQ Assistant</div>
-                <div style={{ fontSize: 11, color: "#ffffff99" }}>● Online · Union Bank of India</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "#FFFFFF" }}>ComplaintIQ Assistant</div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.8)" }}>Online · Union Bank of India</div>
               </div>
-              <button style={{ marginLeft: "auto", background: "transparent", border: "none", color: "#fff", cursor: "pointer", fontSize: 18, padding: 4 }} onClick={() => setOpen(false)}>✕</button>
+              <button style={{ marginLeft: "auto", background: "transparent", border: "none", color: "#FFFFFF", cursor: "pointer", fontSize: 18 }} onClick={() => setOpen(false)}>✕</button>
             </div>
-            <div style={{ flex: 1, overflowY: "auto", padding: 14, display: "flex", flexDirection: "column", gap: 10 }}>
+
+            {/* Chat Messages Area */}
+            <div style={{ flex: 1, overflowY: "auto", padding: 14, display: "flex", flexDirection: "column", gap: 12, background: "#F8FAFC" }}>
               {messages.map((m, i) => (
                 <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start" }}>
-                  <div style={{ maxWidth: "80%", background: m.role === "user" ? `linear-gradient(135deg, ${C.blue}, ${C.blueLight})` : C.navyMid, padding: "10px 14px", borderRadius: m.role === "user" ? "16px 16px 4px 16px" : "16px 16px 16px 4px", fontSize: 13, color: C.white, lineHeight: 1.5 }}>
+                  <div style={{ 
+                    maxWidth: "80%", 
+                    background: m.role === "user" ? C.navy : "#FFFFFF", 
+                    color: m.role === "user" ? "#FFFFFF" : C.textMain, 
+                    padding: "10px 14px", 
+                    borderRadius: m.role === "user" ? "16px 16px 4px 16px" : "16px 16px 16px 4px", 
+                    fontSize: 13, 
+                    lineHeight: 1.5,
+                    boxShadow: m.role === "user" ? "none" : "0 2px 5px rgba(0,0,0,0.05)",
+                    border: m.role === "user" ? "none" : `1px solid ${C.border}`
+                  }}>
                     {m.text}
                   </div>
                 </div>
               ))}
               {loading && (
                 <div style={{ display: "flex", justifyContent: "flex-start" }}>
-                  <div style={{ background: C.navyMid, padding: "10px 14px", borderRadius: "16px 16px 16px 4px", color: C.gray, fontSize: 13 }}>⟳ Thinking...</div>
+                  <div style={{ background: "#FFFFFF", padding: "10px 14px", borderRadius: "16px 16px 16px 4px", color: C.textMuted, fontSize: 13, border: `1px solid ${C.border}` }}>
+                    ⟳ Processing...
+                  </div>
                 </div>
               )}
               <div ref={messagesEnd} />
             </div>
-            <div style={{ padding: 12, borderTop: `1px solid ${C.border}`, display: "flex", gap: 8 }}>
-              <input style={{ ...styles.input, flex: 1 }} value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && sendMessage()} placeholder="Type your message..." />
-              <button style={{ ...styles.btn(), padding: "8px 14px" }} onClick={sendMessage} disabled={loading}>→</button>
+
+            {/* Input Area */}
+            <div style={{ padding: 12, borderTop: `1px solid ${C.border}`, display: "flex", gap: 8, background: "#FFFFFF" }}>
+              <input 
+                style={{ ...styles.input, flex: 1, height: "40px" }} 
+                value={input} 
+                onChange={e => setInput(e.target.value)} 
+                onKeyDown={e => e.key === "Enter" && sendMessage()} 
+                placeholder="Type your message..." 
+              />
+              <button 
+                style={{ ...styles.btn(C.red), width: "45px", height: "40px", display: "flex", alignItems: "center", justifyContent: "center", padding: 0 }} 
+                onClick={sendMessage} 
+                disabled={loading}
+              >
+                →
+              </button>
             </div>
           </div>
         )}
-        <button onClick={() => setOpen(o => !o)} style={{ width: 56, height: 56, borderRadius: "50%", background: `linear-gradient(135deg, ${C.blue}, ${C.cyan})`, border: "none", cursor: "pointer", fontSize: 24, boxShadow: `0 4px 20px ${C.blue}66`, display: "flex", alignItems: "center", justifyContent: "center", transition: "transform 0.2s" }}>
+
+        {/* The Toggle Button (Circle) */}
+        <button 
+          onClick={() => setOpen(o => !o)} 
+          style={{ 
+            width: 60, 
+            height: 60, 
+            borderRadius: "50%", 
+            background: open ? C.navy : C.red, // Changed default color to Union Red to stand out
+            color: "#FFFFFF",
+            border: "none", 
+            cursor: "pointer", 
+            fontSize: 24, 
+            boxShadow: `0 4px 15px rgba(0,0,0,0.2)`, 
+            display: "flex", 
+            alignItems: "center", 
+            justifyContent: "center", 
+            transition: "all 0.3s ease" 
+          }}
+        >
           {open ? "✕" : "💬"}
         </button>
       </div>
@@ -1766,24 +2086,24 @@ function ProfileView({ user }) {
         {/* Profile Card */}
         <div style={styles.card}>
           <div style={{ textAlign: "center", marginBottom: 24 }}>
-            <div style={{ width: 100, height: 100, borderRadius: "50%", background: `linear-gradient(135deg, ${C.blue}, ${C.purple})`, margin: "0 auto 16px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, fontWeight: 700, color: C.white, border: `4px solid ${C.navyMid}` }}>
+            <div style={{ width: 100, height: 100, borderRadius: "50%", background: `linear-gradient(135deg, ${C.navy}, ${C.surface})`, margin: "0 auto 16px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, fontWeight: 700, color: C.white, border: `4px solid ${C.navyMid}` }}>
               {profile.name.split(" ").map(w => w[0]).join("").slice(0, 2)}
             </div>
             <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 4 }}>{profile.name}</h2>
             <div style={{ fontSize: 13, color: C.cyan, fontWeight: 600 }}>{profile.role}</div>
-            <div style={{ fontSize: 11, color: C.gray, marginTop: 4 }}>Member since: {new Date(profile.created_at).toLocaleDateString()}</div>
+            <div style={{ fontSize: 11, color: C.textMuted, marginTop: 4 }}>Member since: {new Date(profile.created_at).toLocaleDateString()}</div>
           </div>
           <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 20 }}>
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 11, color: C.gray, fontWeight: 700, marginBottom: 4 }}>ACCOUNT STATUS</div>
+              <div style={{ fontSize: 11, color: C.textMuted, fontWeight: 700, marginBottom: 4 }}>ACCOUNT STATUS</div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ width: 8, height: 8, borderRadius: "50%", background: profile.is_active ? C.green : C.red }} />
-                <span style={{ fontSize: 13, color: C.white }}>{profile.is_active ? "Active" : "Disabled"}</span>
+                <span style={{ fontSize: 13, color: C.textMuted }}>{profile.is_active ? "Active" : "Disabled"}</span>
               </div>
             </div>
             <div>
-              <div style={{ fontSize: 11, color: C.gray, fontWeight: 700, marginBottom: 4 }}>LAST LOGIN</div>
-              <div style={{ fontSize: 13, color: C.white }}>{profile.last_login ? new Date(profile.last_login).toLocaleString() : "First session"}</div>
+              <div style={{ fontSize: 11, color: C.textMuted, fontWeight: 700, marginBottom: 4 }}>LAST LOGIN</div>
+              <div style={{ fontSize: 13, color: C.textMuted }}>{profile.last_login ? new Date(profile.last_login).toLocaleString() : "First session"}</div>
             </div>
           </div>
         </div>
@@ -1798,35 +2118,35 @@ function ProfileView({ user }) {
             
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
               <div>
-                <label style={{ display: "block", fontSize: 11, color: C.gray, fontWeight: 700, marginBottom: 6 }}>FULL NAME</label>
+                <label style={{ display: "block", fontSize: 11, color: C.textMuted, fontWeight: 700, marginBottom: 6 }}>FULL NAME</label>
                 {editing ? (
                   <input style={styles.input} value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
                 ) : (
-                  <div style={{ fontSize: 14, color: C.white }}>{profile.name}</div>
+                  <div style={{ fontSize: 14, color: C.navy }}>{profile.name}</div>
                 )}
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 11, color: C.gray, fontWeight: 700, marginBottom: 6 }}>EMAIL ADDRESS</label>
+                <label style={{ display: "block", fontSize: 11, color: C.textMuted, fontWeight: 700, marginBottom: 6 }}>EMAIL ADDRESS</label>
                 {editing ? (
                   <input style={styles.input} value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
                 ) : (
-                  <div style={{ fontSize: 14, color: C.white }}>{profile.email}</div>
+                  <div style={{ fontSize: 14, color: C.navy }}>{profile.email}</div>
                 )}
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 11, color: C.gray, fontWeight: 700, marginBottom: 6 }}>ASSIGNED BRANCH</label>
-                <div style={{ fontSize: 14, color: C.white }}>{profile.branch_name || "Enterprise-wide"}</div>
+                <label style={{ display: "block", fontSize: 11, color: C.textMuted, fontWeight: 700, marginBottom: 6 }}>ASSIGNED BRANCH</label>
+                <div style={{ fontSize: 14, color: C.navy }}>{profile.branch_name || "Enterprise-wide"}</div>
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 11, color: C.gray, fontWeight: 700, marginBottom: 6 }}>USER ROLE ID</label>
-                <div style={{ fontSize: 14, color: C.white }}>{profile.role.toUpperCase()}</div>
+                <label style={{ display: "block", fontSize: 11, color: C.textMuted, fontWeight: 700, marginBottom: 6 }}>USER ROLE ID</label>
+                <div style={{ fontSize: 14, color: C.navy }}>{profile.role.toUpperCase()}</div>
               </div>
             </div>
 
             {editing && (
               <div style={{ display: "flex", gap: 12, marginTop: 24, justifyContent: "flex-end" }}>
                 <button style={styles.btnOutline} onClick={() => setEditing(false)}>Cancel</button>
-                <button style={styles.btn(C.blue)} onClick={handleUpdate} disabled={saving}>{saving ? "Saving..." : "Save Changes"}</button>
+                <button style={styles.btn(C.navy)} onClick={handleUpdate} disabled={saving}>{saving ? "Saving..." : "Save Changes"}</button>
               </div>
             )}
           </div>
@@ -1835,14 +2155,14 @@ function ProfileView({ user }) {
             <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}>Security Settings</h3>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0", borderBottom: `1px solid ${C.border}` }}>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: C.white }}>Password Update</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: C.textMuted }}>Password Update</div>
                 <div style={{ fontSize: 11, color: C.gray, marginTop: 2 }}>Last changed 3 months ago</div>
               </div>
               <button style={styles.btnOutline}>Change Password</button>
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 0" }}>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: C.white }}>Two-Factor Authentication</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: C.textMuted }}>Two-Factor Authentication</div>
                 <div style={{ fontSize: 11, color: C.gray, marginTop: 2 }}>Enabled via Union Authenticator</div>
               </div>
               <button style={{ ...styles.badge(C.green), border: "none" }}>Enabled</button>
@@ -1864,11 +2184,11 @@ function NotificationsView({ notifications, onMarkAsRead }) {
           <div style={{ padding: 40, textAlign: "center", color: C.gray }}>No new notifications</div>
         ) : (
           notifications.map(n => (
-            <div key={n.id} style={{ padding: 16, borderBottom: `1px solid ${C.border}`, background: n.read ? "transparent" : `${C.blue}0A`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div key={n.id} style={{ padding: 16, borderBottom: `1px solid ${C.border}`, background: n.read ? "transparent" : `${C.navy}0A`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div style={{ display: "flex", gap: 12 }}>
                 <span style={{ fontSize: 20 }}>{n.icon || '🔔'}</span>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: C.white }}>{n.title}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: C.navy }}>{n.title}</div>
                   <div style={{ fontSize: 12, color: C.grayLight, marginTop: 2 }}>{n.message}</div>
                   <div style={{ fontSize: 10, color: C.gray, marginTop: 4 }}>{n.time}</div>
                 </div>

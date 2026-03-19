@@ -333,11 +333,15 @@ export const getHourlyVolume = async (req: AuthRequest, res: Response): Promise<
   try {
     const result = await query(`
       SELECT 
-        TO_CHAR(created_at, 'HH24:00') as hour,
-        COUNT(*) as count
-      FROM complaints
-      WHERE created_at > NOW() - INTERVAL '1 day'
-      GROUP BY TO_CHAR(created_at, 'HH24:00')
+        TO_CHAR(h, 'HH24:00') as hour,
+        COALESCE(COUNT(c.id), 0)::int as count
+      FROM generate_series(
+        CURRENT_DATE, 
+        CURRENT_DATE + interval '23 hours', 
+        interval '1 hour'
+      ) as h
+      LEFT JOIN complaints c ON TO_CHAR(c.created_at, 'HH24:00') = TO_CHAR(h, 'HH24:00')
+      GROUP BY h
       ORDER BY hour
     `);
     res.json({ hourly: result.rows });
